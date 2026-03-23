@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8"> <!-- NEW (important) -->
+    <title>Admin Login</title>
+
+    <link rel="stylesheet" href="css/admin.css"> <!-- NEW -->
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h2>Admin Login</h2>
+        <p>Login to access dashboard</p>
+
+        <p id="errorMsg" style="color:red; text-align:center;"></p> <!-- NEW -->
+
+        <form method="post" action="/admin-login">
+
+            <label>Username</label>
+            <input type="text" name="username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <!-- BACK TO STUDENT LOGIN -->
+        <div class="extra-link">
+            <a href="login.html">Back to Student Login</a> <!-- NEW -->
+        </div>
+
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("error")) {
+            document.getElementById("errorMsg").textContent = "Invalid admin login!";
+        }
+    </script>
+
+</body>
+</html>

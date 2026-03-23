@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37012.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnrollmentPortalMiniCapstone", "EnrollmentPortalMiniCapstone\EnrollmentPortalMiniCapstone.csproj", "{05B1E12C-22B1-4AC9-BA22-66DBAF7817CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05B1E12C-22B1-4AC9-BA22-66DBAF7817CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B1E12C-22B1-4AC9-BA22-66DBAF7817CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B1E12C-22B1-4AC9-BA22-66DBAF7817CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B1E12C-22B1-4AC9-BA22-66DBAF7817CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {19870B94-EB22-4E07-87BD-36B210291C48}
+	EndGlobalSection
+EndGlobal

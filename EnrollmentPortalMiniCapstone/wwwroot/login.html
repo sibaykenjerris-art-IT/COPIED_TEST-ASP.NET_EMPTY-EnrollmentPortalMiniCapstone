@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="css/login.css">
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h2>Student Login</h2>
+
+        <p id="errorMsg" style="color:red; text-align:center;"></p> <!-- NEW -->
+
+        <form method="post" action="/login">
+
+            <label>Username</label>
+            <input type="text" name="username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Sign In</button>
+
+        </form>
+
+        <!-- ADMIN LINK (like forgot password) -->
+        <div class="extra-link">
+            <a href="admin-login.html">Login as Admin</a>
+        </div>
+
+    </div>
+
+    <script>
+        // CHECK IF URL HAS ERROR
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("error")) {
+            document.getElementById("errorMsg").textContent = "Invalid username or password!";
+        }
+    </script>
+
+</body>
+</html>
