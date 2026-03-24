@@ -1,2 +1,184 @@
-﻿body {
+﻿/* BODY BACKGROUND */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    /* FIXED IMAGE PATH */
+    background-image: url('../images/bground.png');
+    background-position: center 90%;
+    background-repeat: no-repeat;
+    /* FIXED (your old one had error) */
+    background-size: cover;
+}
+
+
+/* HEADER */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 50px 20px;
+    color: white;
+    position: relative;
+    /* FIXED IMAGE PATH */
+    background-image: url("../images/header-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+    /* DARK OVERLAY (KEEP DESIGN) */
+    header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.45);
+    }
+
+
+    /* KEEP TEXT ABOVE OVERLAY */
+    header * {
+        position: relative;
+        z-index: 2;
+    }
+
+
+/* LOGO */
+.logo {
+    width: 80px;
+    height: 80px;
+    background-color: ghostwhite;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-shadow: 0 0 5px #39f, 0 0 30px #39f;
+}
+
+
+/* HEADER TEXT */
+.header-text {
+    text-align: center;
+}
+
+    .header-text h1 {
+        font-size: 36px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .header-text p {
+        font-size: 18px;
+        margin-top: 5px;
+    }
+
+
+/* HERO SECTION */
+.hero {
+    text-align: center;
+    padding: 20px 10px;
+    background: #f8f8f8;
+    border-top: 4px solid #39f;
+}
+
+    .hero h2 {
+        font-size: 32px;
+        color: #0a1f66;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 25px;
+    }
+
+
+/* CONTAINER */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+
+/* LINE */
+hr {
+    margin-top: 1px;
+    border-top: 4px solid #39f;
+    color: #001673;
+}
+
+
+/* FORM */
+form {
+    background: white;
+    padding: 30px;
+    width: 380px;
+    border-radius: 10px;
+    /* FIXED BORDER (you missed style) */
+    border: 2px solid #0a1f66;
+    box-shadow: 0 0 15px #39f;
+    margin: auto;
+}
+
+    form h2 {
+        text-align: center;
+        color: #0a1f66;
+    }
+
+
+/* LABELS */
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 12px;
+}
+
+
+/* INPUTS */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #39f;
+    border-radius: 5px;
+    outline: none;
+}
+
+
+/* BUTTON */
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #39f;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    button:hover {
+        box-shadow: 0 0 20px #39f;
+        transform: scale(1.05);
+    }
+
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 30px;
+    border-top: 4px solid #39f;
+    color: #001673;
+    background: ghostwhite;
 }
