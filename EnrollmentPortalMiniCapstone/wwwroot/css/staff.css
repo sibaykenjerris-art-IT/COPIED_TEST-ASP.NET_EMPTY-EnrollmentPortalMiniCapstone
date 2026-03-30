@@ -1,34 +1,31 @@
 ﻿body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #eef3f8;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background: linear-gradient(135deg, #0a1f66, #39f);
 }
 
 .login-container {
-    width: 300px;
+    width: 320px;
     padding: 25px;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 h2 {
     text-align: center;
-}
-
-p {
-    text-align: center;
-    font-size: 14px;
-    color: gray;
+    margin-bottom: 15px;
+    color: #0a1f66;
 }
 
 label {
     display: block;
     margin-top: 10px;
+    font-weight: bold;
 }
 
 input {
@@ -43,14 +40,15 @@ button {
     width: 100%;
     margin-top: 15px;
     padding: 10px;
-    background: #4a90e2;
+    background: #39f;
     color: white;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
     button:hover {
-        background: #357bd8;
+        background: #007bff;
     }
 
 .extra-link {
@@ -60,5 +58,11 @@ button {
 
     .extra-link a {
         text-decoration: none;
-        color: #4a90e2;
+        color: #39f;
     }
+
+#errorMsg {
+    color: red;
+    text-align: center;
+    font-size: 14px;
+}

@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Dashboard</title>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #007BFF;
+            color: white;
+        }
+        /* BLUE DESIGN */
+    </style>
+
+</head>
+<body>
+
+    <h1>Enrolled Students</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>Status</th>
+                <th>Remarks</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+// FETCH DATA FROM BACKEND
+fetch('/students')
+.then(res => res.json())
+.then(data => {
+
+    console.log(data); // DEBUG (check values)
+
+    let table = document.getElementById("tableBody");
+    table.innerHTML = ""; // CLEAR TABLE
+
+    data.forEach(s => {
+
+        // FIX: use lowercase keys
+        let color = s.status === "Approved" ? "green" :
+                    s.status === "Rejected" ? "red" : "orange";
+
+        let row = `
+        <tr>
+        <td>${s.name}</td>
+        <td>${s.course}</td>
+        <td>${s.year}</td>
+        <td style="color:${color}">${s.status}</td>
+        <td>${s.remarks}</td>
+        <td>
+
+            <form method="post" action="/update-status">
+                <input type="hidden" name="id" value="${s.id}">
+                <input type="hidden" name="status" value="Approved">
+                <input type="hidden" name="remarks" value="Verified">
+                <button style="background:green;color:white;">Approve</button>
+            </form>
+
+            <form method="post" action="/update-status">
+                <input type="hidden" name="id" value="${s.id}">
+                <input type="hidden" name="status" value="Rejected">
+                <input type="hidden" name="remarks" value="Invalid Info">
+                <button style="background:red;color:white;">Reject</button>
+            </form>
+
+        </td>
+        </tr>
+        `;
+
+        table.innerHTML += row;
+    });
+});
+</script>
+
+</body>
+</html>

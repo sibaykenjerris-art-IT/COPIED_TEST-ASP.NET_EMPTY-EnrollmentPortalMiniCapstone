@@ -1,81 +1,42 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+
     <meta charset="UTF-8">
+    <title>CEC Online Enrollment</title>
 
-    <!-- FIXED (quote issue) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CEC ONLINE ENROLLMENT</title>
-
-    <!-- FIXED PATH (if inside css folder) -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/welcome.css">
 
 </head>
 
 <body>
 
-    <header>
-        <img src="images/logo.png" class="logo">
-
-        <div class="header-text">
-            <h1>CEC ONLINE ENROLLMENT</h1>
-            <p>Information Technology</p>
-        </div>
-    </header>
-
-    <section class="hero">
-
-        <h2>Start Your Future in Information Technology</h2>
-
-        <p>Join Cebu Eastern College and become part of the next generation of IT professionals.</p>
-
-    </section>
-
-    <hr>
+    <!-- STAFF LOGIN TOP RIGHT -->
+    <div style="position:absolute; top:15px; right:20px;">
+        <a href="staff-login.html"
+           style="
+            background:white;
+            color:#0a1f66;
+            padding:10px;
+            border-radius:5px;
+            border:2px solid #0a1f66;
+            text-decoration:none;
+            font-weight:bold;
+">
+            Login as Staff
+        </a>
+    </div>
 
     <div class="container">
 
-        <!-- ONLY CHANGES ARE HERE -->
-        <form method="post" action="/enroll">
-            <!-- NEW -->
+        <h1>CEC ONLINE ENROLLMENT</h1>
 
-            <h2>Student Information</h2>
+        <p>Welcome to Cebu Eastern College Enrollment System</p>
 
-            <label>Full Name</label>
-            <input type="text" name="Name" placeholder="Enter full name" required> <!-- NEW name -->
-
-            <label>Email</label>
-            <input type="email" name="Email" placeholder="Enter email" required> <!-- NEW -->
-
-            <label>Phone Number</label>
-            <input type="tel" name="Contact" placeholder="Enter phone number" required> <!-- NEW -->
-
-            <label>Address</label>
-            <input type="text" name="Address" placeholder="Enter address"> <!-- NEW -->
-
-            <label>Year Level</label>
-            <select name="Year" required>
-                <!-- NEW -->
-                <option value="">Select Year Level</option>
-                <option>1st Year</option>
-                <option>2nd Year</option>
-                <option>3rd Year</option>
-                <option>4th Year</option>
-            </select>
-
-            <label>Course</label>
-            <input type="text" name="Course" value="Bachelor of Science in Information Technology (BSIT)" readonly> <!-- NEW -->
-
-            <button type="submit">Enroll Now</button>
-
-        </form>
+        <!-- REDIRECT TO ENROLLMENT PAGE -->
+        <button onclick="location.href='enroll.html'">Register Now</button>
 
     </div>
-
-    <footer>
-        <p>© 2026 Cebu Eastern College | IT Enrollment System</p>
-    </footer>
 
 </body>
 </html>

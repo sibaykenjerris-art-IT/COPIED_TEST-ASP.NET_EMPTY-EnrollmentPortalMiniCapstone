@@ -1,10 +1,11 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
 
-    <link rel="stylesheet" href="css/login.css">
+    <meta charset="UTF-8">
+    <title>Staff Login</title>
+
+    <link rel="stylesheet" href="css/staff.css"> <!-- NEW -->
 
 </head>
 
@@ -12,11 +13,12 @@
 
     <div class="login-container">
 
-        <h2>Student Login</h2>
+        <h2>Staff Login</h2>
 
-        <p id="errorMsg" style="color:red; text-align:center;"></p> <!-- NEW -->
+        <!-- ERROR MESSAGE -->
+        <p id="errorMsg"></p>
 
-        <form method="post" action="/login">
+        <form method="post" action="/staff-login">
 
             <label>Username</label>
             <input type="text" name="username" required>
@@ -24,22 +26,21 @@
             <label>Password</label>
             <input type="password" name="password" required>
 
-            <button type="submit">Sign In</button>
+            <button type="submit">Login</button>
 
         </form>
 
-        <!-- ADMIN LINK (like forgot password) -->
         <div class="extra-link">
-            <a href="admin-login.html">Login as Admin</a>
+            <a href="index.html">Back to Enrollment</a>
         </div>
 
     </div>
 
+    <!-- SHOW ERROR IF WRONG LOGIN -->
     <script>
-        // CHECK IF URL HAS ERROR
         const params = new URLSearchParams(window.location.search);
         if (params.get("error")) {
-            document.getElementById("errorMsg").textContent = "Invalid username or password!";
+            document.getElementById("errorMsg").textContent = "Invalid login!";
         }
     </script>
 
