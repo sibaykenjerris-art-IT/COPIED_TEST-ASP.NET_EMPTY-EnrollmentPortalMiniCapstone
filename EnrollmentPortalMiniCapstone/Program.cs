@@ -1,9 +1,8 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -13,10 +12,10 @@ app.UseStaticFiles();
 
 
 // ==============================
-// DATABASE SETUP (NEW) - SQLite
+// DATABASE SETUP (SQLite)
 // ==============================
 string dbPath = Path.Combine(app.Environment.ContentRootPath, "Data", "students.db");
-Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "Data")); // Ensure Data folder exists
+Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "Data"));
 
 using (var connection = new SqliteConnection($"Data Source={dbPath}"))
 {
@@ -41,14 +40,14 @@ using (var connection = new SqliteConnection($"Data Source={dbPath}"))
 
 
 // ==============================
-// STAFF LOGIN (REPLACES ADMIN)
+// STAFF LOGIN
 // ==============================
 app.MapPost("/staff-login", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
 
-    string username = form["username"].ToString(); // NEW: cast to string
-    string password = form["password"].ToString(); // NEW: cast to string
+    string username = form["username"].ToString();
+    string password = form["password"].ToString();
 
     if (username == "staff" && password == "1234")
     {
@@ -62,7 +61,7 @@ app.MapPost("/staff-login", async (HttpContext context) =>
 
 
 // ==============================
-// ENROLLMENT SAVE (SQLITE)
+// ENROLL STUDENT
 // ==============================
 app.MapPost("/enroll", async (HttpContext context) =>
 {
@@ -73,11 +72,10 @@ app.MapPost("/enroll", async (HttpContext context) =>
 
     var cmd = connection.CreateCommand();
     cmd.CommandText =
-    @"INSERT INTO Students 
+    @"INSERT INTO Students
     (Name, Email, Contact, Course, Year, Address, Status, Remarks)
     VALUES ($name, $email, $contact, $course, $year, $address, 'Pending', 'Waiting Verification');";
 
-    // NEW: Cast StringValues to string to avoid InvalidOperationException
     cmd.Parameters.AddWithValue("$name", form["Name"].ToString());
     cmd.Parameters.AddWithValue("$email", form["Email"].ToString());
     cmd.Parameters.AddWithValue("$contact", form["Contact"].ToString());
@@ -87,14 +85,14 @@ app.MapPost("/enroll", async (HttpContext context) =>
 
     cmd.ExecuteNonQuery();
 
-    context.Response.Redirect("/success.html"); // NEW: redirect to a success page after registration
+    context.Response.Redirect("/success.html");
 });
 
 
 // ==============================
-// GET STUDENTS (FOR STAFF TABLE)
+// GET STUDENTS (FOR DASHBOARD)
 // ==============================
-app.MapGet("/students", async () =>
+app.MapGet("/students", () =>
 {
     var list = new List<object>();
 
@@ -110,15 +108,15 @@ app.MapGet("/students", async () =>
     {
         list.Add(new
         {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            Email = reader.GetString(2),
-            Contact = reader.GetString(3),
-            Course = reader.GetString(4),
-            Year = reader.GetString(5),
-            Address = reader.GetString(6),
-            Status = reader.GetString(7),
-            Remarks = reader.GetString(8)
+            id = reader.GetInt32(0),
+            name = reader.GetString(1),
+            email = reader.GetString(2),
+            contact = reader.GetString(3),
+            course = reader.GetString(4),
+            year = reader.GetString(5),
+            address = reader.GetString(6),
+            status = reader.GetString(7),
+            remarks = reader.GetString(8)
         });
     }
 
@@ -127,7 +125,7 @@ app.MapGet("/students", async () =>
 
 
 // ==============================
-// UPDATE STATUS (APPROVE / REJECT)
+// UPDATE STATUS (APPROVE/REJECT)
 // ==============================
 app.MapPost("/update-status", async (HttpContext context) =>
 {
@@ -140,13 +138,12 @@ app.MapPost("/update-status", async (HttpContext context) =>
 
     if (!int.TryParse(idValue, out int studentId))
     {
-        context.Response.Redirect("/staff.html"); // FIX
-        return; // VERY IMPORTANT
+        return Results.BadRequest("Invalid ID");
     }
 
     var cmd = connection.CreateCommand();
     cmd.CommandText =
-    @"UPDATE Students 
+    @"UPDATE Students
       SET Status = $status, Remarks = $remarks
       WHERE Id = $id";
 
@@ -156,7 +153,35 @@ app.MapPost("/update-status", async (HttpContext context) =>
 
     cmd.ExecuteNonQuery();
 
-    context.Response.Redirect("/staff.html");
+    return Results.Ok(); // 🔥 NO REDIRECT
+});
+
+
+// ==============================
+// DELETE STUDENT
+// ==============================
+app.MapPost("/delete-student", async (HttpContext context) =>
+{
+    var form = await context.Request.ReadFormAsync();
+
+    using var connection = new SqliteConnection($"Data Source={dbPath}");
+    connection.Open();
+
+    var idValue = form["id"].ToString();
+
+    if (!int.TryParse(idValue, out int studentId))
+    {
+        return Results.BadRequest("Invalid ID");
+    }
+
+    var cmd = connection.CreateCommand();
+    cmd.CommandText = "DELETE FROM Students WHERE Id = $id";
+
+    cmd.Parameters.AddWithValue("$id", studentId);
+
+    cmd.ExecuteNonQuery();
+
+    return Results.Ok(); // 🔥 NO REDIRECT
 });
 
 
