@@ -72,12 +72,42 @@
         </form>
 
     </div>
-          
 
-   
+
     <footer>
         <p>© 2026 Cebu Eastern College | IT Enrollment System</p>
     </footer>
+
+    <!-- ADD THIS SCRIPT BEFORE </body> -->
+    <script>
+
+        // STEP 1: Get the form
+        const form = document.querySelector("form");
+
+        // STEP 2: Listen when user submits
+        form.addEventListener("submit", function (event) {
+
+            // Get values
+            let name = form["Name"].value;
+            let email = form["Email"].value;
+            let contact = form["Contact"].value;
+            let year = form["Year"].value;
+
+            // STEP 3: Validate
+            if (name === "" || email === "" || contact === "" || year === "") {
+
+                alert("Please fill out all required fields!");
+                event.preventDefault(); // STOP form
+
+                return;
+            }
+
+            // STEP 4: Success message
+            alert("Enrollment submitted successfully!");
+
+        });
+
+    </script>
 
 </body>
 </html>

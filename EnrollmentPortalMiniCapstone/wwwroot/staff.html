@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff Dashboard</title>
+
+    <!-- LINK TO CSS -->
     <link rel="stylesheet" href="/css/dashboard-staff.css">
 </head>
 
@@ -10,18 +12,23 @@
 
     <h1>Staff Dashboard</h1>
 
+    <!-- LOGOUT BUTTON -->
     <button class="logout" onclick="window.location.href='/staff-login.html'">Logout</button>
 
     <div class="container">
 
-        <!-- STATS -->
+        <!-- ============================
+             STATS (Approved / Rejected / Pending)
+        ============================ -->
         <div id="stats">
             <div class="stat-box approved">Approved<br><span id="approvedCount">0</span></div>
             <div class="stat-box rejected">Rejected<br><span id="rejectedCount">0</span></div>
             <div class="stat-box pending">Pending<br><span id="pendingCount">0</span></div>
         </div>
 
-        <!-- FILTER -->
+        <!-- ============================
+             FILTER BUTTONS
+        ============================ -->
         <div class="filters">
             <button onclick="filterYear('All')">All</button>
             <button onclick="filterYear('1st Year')">1st Year</button>
@@ -30,9 +37,12 @@
             <button onclick="filterYear('4th Year')">4th Year</button>
         </div>
 
+        <!-- CURRENT VIEW TEXT -->
         <div id="currentView">Viewing: All</div>
 
-        <!-- TABLE -->
+        <!-- ============================
+             TABLE
+        ============================ -->
         <table>
             <thead>
                 <tr>
@@ -46,12 +56,17 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+
+            <tbody id="tableBody">
+                <!-- DATA WILL BE INSERTED HERE -->
+            </tbody>
         </table>
 
     </div>
 
-    <!-- MODAL -->
+    <!-- ============================
+         CONFIRMATION MODAL
+    ============================ -->
     <div id="confirmModal" class="modal">
         <div class="modal-content">
             <p id="modalText">Are you sure?</p>
@@ -60,121 +75,232 @@
         </div>
     </div>
 
+
+    <!-- ============================
+         JAVASCRIPT (BEGINNER FRIENDLY)
+    ============================ -->
     <script>
+
+        // STORE ALL STUDENTS
         let allStudents = [];
+
+        // CURRENT FILTER (DEFAULT = ALL)
         let currentFilter = "All";
+
+        // STORE FORM DATA FOR MODAL
         let selectedFormData = null;
         let selectedAction = "";
 
-        // Convert year
+
+        // ============================
+        // STEP 1: FORMAT YEAR
+        // ============================
         function formatYear(year) {
+
             if (year == "1") return "1st Year";
             if (year == "2") return "2nd Year";
             if (year == "3") return "3rd Year";
             if (year == "4") return "4th Year";
+
             return year;
         }
 
-        // Modal
+
+        // ============================
+        // STEP 2: OPEN MODAL
+        // ============================
         function openModal(form, message, actionUrl) {
+
             selectedFormData = new FormData(form);
             selectedAction = actionUrl;
+
             document.getElementById("modalText").innerText = message;
+
+            // SHOW MODAL
             document.getElementById("confirmModal").style.display = "flex";
         }
+
+
+        // ============================
+        // STEP 3: CLOSE MODAL
+        // ============================
         function closeModal() {
             document.getElementById("confirmModal").style.display = "none";
         }
+
+
+        // ============================
+        // STEP 4: CONFIRM ACTION
+        // ============================
         function confirmAction() {
-            fetch(selectedAction, { method: "POST", body: selectedFormData })
-                .then(() => {
+
+            fetch(selectedAction, {
+                method: "POST",
+                body: selectedFormData
+            })
+                .then(function () {
+
+                    // CLOSE MODAL
                     closeModal();
+
+                    // RELOAD DATA
                     loadStudents();
                 });
         }
 
-        // Filter
+
+        // ============================
+        // STEP 5: FILTER YEAR
+        // ============================
         function filterYear(year) {
+
             currentFilter = year;
+
+            // UPDATE TEXT
             document.getElementById("currentView").innerText = "Viewing: " + year;
+
             renderTable();
         }
 
-        // Load
+
+        // ============================
+        // STEP 6: LOAD STUDENTS FROM SERVER
+        // ============================
         function loadStudents() {
+
             fetch('/students')
-                .then(res => res.json())
-                .then(data => {
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+
                     allStudents = data;
+
                     renderTable();
                 });
         }
 
-        // Render
+
+        // ============================
+        // STEP 7: RENDER TABLE
+        // ============================
         function renderTable() {
+
             let table = document.getElementById("tableBody");
+
+            // CLEAR TABLE FIRST
             table.innerHTML = "";
 
-            let approved = 0, rejected = 0, pending = 0;
+            // COUNTERS
+            let approved = 0;
+            let rejected = 0;
+            let pending = 0;
 
-            allStudents.forEach(s => {
-                let y = formatYear(s.year);
-                if (currentFilter != "All" && y != currentFilter) return;
+            // LOOP ALL STUDENTS
+            allStudents.forEach(function (s) {
 
-                if (s.status == "Approved") approved++;
-                else if (s.status == "Rejected") rejected++;
-                else pending++;
+                let yearFormatted = formatYear(s.year);
 
-                let color = s.status == "Approved" ? "green" :
-                    s.status == "Rejected" ? "red" : "orange";
+                // FILTER CHECK
+                if (currentFilter != "All") {
+                    if (yearFormatted != currentFilter) {
+                        return;
+                    }
+                }
 
+                // COUNT STATUS
+                if (s.status == "Approved") {
+                    approved = approved + 1;
+                }
+                else if (s.status == "Rejected") {
+                    rejected = rejected + 1;
+                }
+                else {
+                    pending = pending + 1;
+                }
+
+                // STATUS COLOR
+                let color = "orange";
+
+                if (s.status == "Approved") {
+                    color = "green";
+                }
+                else if (s.status == "Rejected") {
+                    color = "red";
+                }
+
+                // CREATE ROW
                 let row = `
             <tr>
                 <td>${s.name}</td>
                 <td>${s.email}</td>
                 <td>${s.contact}</td>
                 <td>${s.course}</td>
-                <td>${y}</td>
-                <td style="color:${color};font-weight:bold;">${s.status}</td>
+                <td>${yearFormatted}</td>
+                <td style="color:${color}; font-weight:bold;">${s.status}</td>
                 <td>${s.remarks}</td>
+
                 <td>
                     <div class="actions">
 
+                    <!-- APPROVE -->
                     <form method="post" action="/update-status">
                         <input type="hidden" name="id" value="${s.id}">
                         <input type="hidden" name="status" value="Approved">
                         <input type="hidden" name="remarks" value="Verified">
+
                         <button class="approve"
-                        onclick="event.preventDefault();openModal(this.form,'Approve student?','/update-status')">Approve</button>
+                        onclick="event.preventDefault(); openModal(this.form, 'Approve student?', '/update-status')">
+                        Approve
+                        </button>
                     </form>
 
+                    <!-- REJECT -->
                     <form method="post" action="/update-status">
                         <input type="hidden" name="id" value="${s.id}">
                         <input type="hidden" name="status" value="Rejected">
                         <input type="hidden" name="remarks" value="Invalid Info">
+
                         <button class="reject"
-                        onclick="event.preventDefault();openModal(this.form,'Reject student?','/update-status')">Reject</button>
+                        onclick="event.preventDefault(); openModal(this.form, 'Reject student?', '/update-status')">
+                        Reject
+                        </button>
                     </form>
 
+                    <!-- DELETE -->
                     ${s.status != "Pending" ? `
                     <form method="post" action="/delete-student">
                         <input type="hidden" name="id" value="${s.id}">
+
                         <button class="delete"
-                        onclick="event.preventDefault();openModal(this.form,'Delete permanently?','/delete-student')">Delete</button>
-                    </form>`: ""}
+                        onclick="event.preventDefault(); openModal(this.form, 'Delete permanently?', '/delete-student')">
+                        Delete
+                        </button>
+                    </form>
+                    ` : ""}
 
                     </div>
                 </td>
-            </tr>`;
+            </tr>
+            `;
+
+                // ADD ROW TO TABLE
                 table.innerHTML += row;
+
             });
 
+            // UPDATE COUNTS
             document.getElementById("approvedCount").innerText = approved;
             document.getElementById("rejectedCount").innerText = rejected;
             document.getElementById("pendingCount").innerText = pending;
         }
 
+
+        // ============================
+        // START APP
+        // ============================
         loadStudents();
+
     </script>
 
 </body>

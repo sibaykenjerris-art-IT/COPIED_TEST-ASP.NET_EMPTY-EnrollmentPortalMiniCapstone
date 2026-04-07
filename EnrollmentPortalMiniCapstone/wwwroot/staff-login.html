@@ -38,9 +38,15 @@
 
     <!-- SHOW ERROR IF WRONG LOGIN -->
     <script>
+        // STEP 1: Get URL parameters
         const params = new URLSearchParams(window.location.search);
+
+        // STEP 2: Check if error exists
         if (params.get("error")) {
+
+            // STEP 3: Show message
             document.getElementById("errorMsg").textContent = "Invalid login!";
+            document.getElementById("errorMsg").style.color = "red";
         }
     </script>
 

@@ -7,22 +7,26 @@ using System.IO;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+// Enable static files (HTML, CSS, JS)
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 
 // ==============================
-// DATABASE SETUP (SQLite)
+// STEP 1: DATABASE SETUP
 // ==============================
 string dbPath = Path.Combine(app.Environment.ContentRootPath, "Data", "students.db");
+
+// Make sure folder exists
 Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "Data"));
 
+// Create table if not exists
 using (var connection = new SqliteConnection($"Data Source={dbPath}"))
 {
     connection.Open();
 
-    var tableCmd = connection.CreateCommand();
-    tableCmd.CommandText =
+    var cmd = connection.CreateCommand();
+    cmd.CommandText =
     @"CREATE TABLE IF NOT EXISTS Students (
         Id INTEGER PRIMARY KEY AUTOINCREMENT,
         Name TEXT,
@@ -35,19 +39,19 @@ using (var connection = new SqliteConnection($"Data Source={dbPath}"))
         Remarks TEXT
     );";
 
-    tableCmd.ExecuteNonQuery();
+    cmd.ExecuteNonQuery();
 }
 
 
 // ==============================
-// STAFF LOGIN
+// STEP 2: STAFF LOGIN
 // ==============================
 app.MapPost("/staff-login", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
 
-    string username = form["username"].ToString();
-    string password = form["password"].ToString();
+    string username = form["username"];
+    string password = form["password"];
 
     if (username == "staff" && password == "1234")
     {
@@ -61,7 +65,7 @@ app.MapPost("/staff-login", async (HttpContext context) =>
 
 
 // ==============================
-// ENROLL STUDENT
+// STEP 3: ENROLL STUDENT
 // ==============================
 app.MapPost("/enroll", async (HttpContext context) =>
 {
@@ -71,8 +75,9 @@ app.MapPost("/enroll", async (HttpContext context) =>
     connection.Open();
 
     var cmd = connection.CreateCommand();
+
     cmd.CommandText =
-    @"INSERT INTO Students
+    @"INSERT INTO Students 
     (Name, Email, Contact, Course, Year, Address, Status, Remarks)
     VALUES ($name, $email, $contact, $course, $year, $address, 'Pending', 'Waiting Verification');";
 
@@ -90,11 +95,11 @@ app.MapPost("/enroll", async (HttpContext context) =>
 
 
 // ==============================
-// GET STUDENTS (FOR DASHBOARD)
+// STEP 4: GET STUDENTS (API)
 // ==============================
 app.MapGet("/students", () =>
 {
-    var list = new List<object>();
+    var students = new List<object>();
 
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
@@ -106,7 +111,7 @@ app.MapGet("/students", () =>
 
     while (reader.Read())
     {
-        list.Add(new
+        students.Add(new
         {
             id = reader.GetInt32(0),
             name = reader.GetString(1),
@@ -120,12 +125,12 @@ app.MapGet("/students", () =>
         });
     }
 
-    return Results.Json(list);
+    return Results.Json(students);
 });
 
 
 // ==============================
-// UPDATE STATUS (APPROVE/REJECT)
+// STEP 5: UPDATE STATUS
 // ==============================
 app.MapPost("/update-status", async (HttpContext context) =>
 {
@@ -134,31 +139,26 @@ app.MapPost("/update-status", async (HttpContext context) =>
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
 
-    var idValue = form["id"].ToString();
-
-    if (!int.TryParse(idValue, out int studentId))
-    {
-        return Results.BadRequest("Invalid ID");
-    }
+    int id = int.Parse(form["id"]);
 
     var cmd = connection.CreateCommand();
     cmd.CommandText =
-    @"UPDATE Students
+    @"UPDATE Students 
       SET Status = $status, Remarks = $remarks
       WHERE Id = $id";
 
     cmd.Parameters.AddWithValue("$status", form["status"].ToString());
     cmd.Parameters.AddWithValue("$remarks", form["remarks"].ToString());
-    cmd.Parameters.AddWithValue("$id", studentId);
+    cmd.Parameters.AddWithValue("$id", id);
 
     cmd.ExecuteNonQuery();
 
-    return Results.Ok(); // 🔥 NO REDIRECT
+    return Results.Ok(); // IMPORTANT
 });
 
 
 // ==============================
-// DELETE STUDENT
+// STEP 6: DELETE STUDENT
 // ==============================
 app.MapPost("/delete-student", async (HttpContext context) =>
 {
@@ -167,22 +167,16 @@ app.MapPost("/delete-student", async (HttpContext context) =>
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
 
-    var idValue = form["id"].ToString();
-
-    if (!int.TryParse(idValue, out int studentId))
-    {
-        return Results.BadRequest("Invalid ID");
-    }
+    int id = int.Parse(form["id"]);
 
     var cmd = connection.CreateCommand();
     cmd.CommandText = "DELETE FROM Students WHERE Id = $id";
 
-    cmd.Parameters.AddWithValue("$id", studentId);
+    cmd.Parameters.AddWithValue("$id", id);
 
     cmd.ExecuteNonQuery();
 
-    return Results.Ok(); // 🔥 NO REDIRECT
+    return Results.Ok(); // IMPORTANT
 });
-
 
 app.Run();
