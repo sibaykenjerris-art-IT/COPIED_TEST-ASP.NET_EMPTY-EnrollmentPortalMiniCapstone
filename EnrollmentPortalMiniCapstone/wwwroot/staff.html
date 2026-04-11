@@ -3,32 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff Dashboard</title>
-
-    <!-- LINK TO CSS -->
-    <link rel="stylesheet" href="/css/dashboard-staff.css">
+    <link rel="stylesheet" href="css/dashboard-staff.css">
 </head>
 
 <body>
 
     <h1>Staff Dashboard</h1>
 
-    <!-- LOGOUT BUTTON -->
+    <!-- LOGOUT -->
     <button class="logout" onclick="window.location.href='/staff-login.html'">Logout</button>
 
     <div class="container">
 
-        <!-- ============================
-             STATS (Approved / Rejected / Pending)
-        ============================ -->
+        <!-- STATS -->
         <div id="stats">
             <div class="stat-box approved">Approved<br><span id="approvedCount">0</span></div>
             <div class="stat-box rejected">Rejected<br><span id="rejectedCount">0</span></div>
             <div class="stat-box pending">Pending<br><span id="pendingCount">0</span></div>
         </div>
 
-        <!-- ============================
-             FILTER BUTTONS
-        ============================ -->
+        <!-- FILTER -->
         <div class="filters">
             <button onclick="filterYear('All')">All</button>
             <button onclick="filterYear('1st Year')">1st Year</button>
@@ -37,12 +31,10 @@
             <button onclick="filterYear('4th Year')">4th Year</button>
         </div>
 
-        <!-- CURRENT VIEW TEXT -->
+        <!-- CURRENT VIEW -->
         <div id="currentView">Viewing: All</div>
 
-        <!-- ============================
-             TABLE
-        ============================ -->
+        <!-- TABLE -->
         <table>
             <thead>
                 <tr>
@@ -57,16 +49,12 @@
                 </tr>
             </thead>
 
-            <tbody id="tableBody">
-                <!-- DATA WILL BE INSERTED HERE -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
 
     </div>
 
-    <!-- ============================
-         CONFIRMATION MODAL
-    ============================ -->
+    <!-- CONFIRM MODAL -->
     <div id="confirmModal" class="modal">
         <div class="modal-content">
             <p id="modalText">Are you sure?</p>
@@ -75,230 +63,193 @@
         </div>
     </div>
 
-
-    <!-- ============================
-         JAVASCRIPT (BEGINNER FRIENDLY)
-    ============================ -->
     <script>
 
-        // STORE ALL STUDENTS
-        let allStudents = [];
-
-        // CURRENT FILTER (DEFAULT = ALL)
+        // ==============================
+        // GLOBAL VARIABLES
+        // ==============================
+        let students = [];
         let currentFilter = "All";
 
-        // STORE FORM DATA FOR MODAL
-        let selectedFormData = null;
+        // FOR MODAL
+        let selectedId = null;
+        let selectedStatus = "";
+        let selectedRemarks = "";
         let selectedAction = "";
 
 
-        // ============================
-        // STEP 1: FORMAT YEAR
-        // ============================
-        function formatYear(year) {
-
-            if (year == "1") return "1st Year";
-            if (year == "2") return "2nd Year";
-            if (year == "3") return "3rd Year";
-            if (year == "4") return "4th Year";
-
-            return year;
-        }
-
-
-        // ============================
-        // STEP 2: OPEN MODAL
-        // ============================
-        function openModal(form, message, actionUrl) {
-
-            selectedFormData = new FormData(form);
-            selectedAction = actionUrl;
-
-            document.getElementById("modalText").innerText = message;
-
-            // SHOW MODAL
-            document.getElementById("confirmModal").style.display = "flex";
-        }
-
-
-        // ============================
-        // STEP 3: CLOSE MODAL
-        // ============================
-        function closeModal() {
-            document.getElementById("confirmModal").style.display = "none";
-        }
-
-
-        // ============================
-        // STEP 4: CONFIRM ACTION
-        // ============================
-        function confirmAction() {
-
-            fetch(selectedAction, {
-                method: "POST",
-                body: selectedFormData
-            })
-                .then(function () {
-
-                    // CLOSE MODAL
-                    closeModal();
-
-                    // RELOAD DATA
-                    loadStudents();
-                });
-        }
-
-
-        // ============================
-        // STEP 5: FILTER YEAR
-        // ============================
-        function filterYear(year) {
-
-            currentFilter = year;
-
-            // UPDATE TEXT
-            document.getElementById("currentView").innerText = "Viewing: " + year;
-
-            renderTable();
-        }
-
-
-        // ============================
-        // STEP 6: LOAD STUDENTS FROM SERVER
-        // ============================
+        // ==============================
+        // LOAD STUDENTS FROM SERVER
+        // ==============================
         function loadStudents() {
 
             fetch('/students')
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
+                .then(res => res.json())
+                .then(data => {
 
-                    allStudents = data;
+                    students = data;
 
                     renderTable();
                 });
         }
 
 
-        // ============================
-        // STEP 7: RENDER TABLE
-        // ============================
+        // ==============================
+        // RENDER TABLE + COUNTERS
+        // ==============================
         function renderTable() {
 
             let table = document.getElementById("tableBody");
-
-            // CLEAR TABLE FIRST
             table.innerHTML = "";
 
-            // COUNTERS
             let approved = 0;
             let rejected = 0;
             let pending = 0;
 
-            // LOOP ALL STUDENTS
-            allStudents.forEach(function (s) {
+            students.forEach(s => {
 
-                let yearFormatted = formatYear(s.year);
+                // FILTER FIX
+                if (currentFilter !== "All" && s.year !== currentFilter) return;
 
-                // FILTER CHECK
-                if (currentFilter != "All") {
-                    if (yearFormatted != currentFilter) {
-                        return;
-                    }
-                }
+                // COUNT
+                if (s.status === "Approved") approved++;
+                else if (s.status === "Rejected") rejected++;
+                else pending++;
 
-                // COUNT STATUS
-                if (s.status == "Approved") {
-                    approved = approved + 1;
-                }
-                else if (s.status == "Rejected") {
-                    rejected = rejected + 1;
-                }
-                else {
-                    pending = pending + 1;
-                }
-
-                // STATUS COLOR
+                // COLOR STATUS
                 let color = "orange";
+                if (s.status === "Approved") color = "green";
+                if (s.status === "Rejected") color = "red";
 
-                if (s.status == "Approved") {
-                    color = "green";
-                }
-                else if (s.status == "Rejected") {
-                    color = "red";
-                }
-
-                // CREATE ROW
                 let row = `
             <tr>
                 <td>${s.name}</td>
                 <td>${s.email}</td>
                 <td>${s.contact}</td>
                 <td>${s.course}</td>
-                <td>${yearFormatted}</td>
-                <td style="color:${color}; font-weight:bold;">${s.status}</td>
+                <td>${s.year}</td>
+
+                <td style="color:${color}; font-weight:bold;">
+                    ${s.status}
+                </td>
+
                 <td>${s.remarks}</td>
 
                 <td>
                     <div class="actions">
 
-                    <!-- APPROVE -->
-                    <form method="post" action="/update-status">
-                        <input type="hidden" name="id" value="${s.id}">
-                        <input type="hidden" name="status" value="Approved">
-                        <input type="hidden" name="remarks" value="Verified">
-
                         <button class="approve"
-                        onclick="event.preventDefault(); openModal(this.form, 'Approve student?', '/update-status')">
+                        onclick="openModal(${s.id}, 'Approved', 'Verified', 'update')">
                         Approve
                         </button>
-                    </form>
-
-                    <!-- REJECT -->
-                    <form method="post" action="/update-status">
-                        <input type="hidden" name="id" value="${s.id}">
-                        <input type="hidden" name="status" value="Rejected">
-                        <input type="hidden" name="remarks" value="Invalid Info">
 
                         <button class="reject"
-                        onclick="event.preventDefault(); openModal(this.form, 'Reject student?', '/update-status')">
+                        onclick="openModal(${s.id}, 'Rejected', 'Invalid Info', 'update')">
                         Reject
                         </button>
-                    </form>
 
-                    <!-- DELETE -->
-                    ${s.status != "Pending" ? `
-                    <form method="post" action="/delete-student">
-                        <input type="hidden" name="id" value="${s.id}">
-
+                        ${s.status !== "Pending" ? `
                         <button class="delete"
-                        onclick="event.preventDefault(); openModal(this.form, 'Delete permanently?', '/delete-student')">
+                        onclick="openModal(${s.id}, '', '', 'delete')">
                         Delete
-                        </button>
-                    </form>
-                    ` : ""}
+                        </button>` : ""}
 
                     </div>
                 </td>
             </tr>
             `;
 
-                // ADD ROW TO TABLE
                 table.innerHTML += row;
-
             });
 
-            // UPDATE COUNTS
+            // UPDATE COUNTERS
             document.getElementById("approvedCount").innerText = approved;
             document.getElementById("rejectedCount").innerText = rejected;
             document.getElementById("pendingCount").innerText = pending;
         }
 
 
-        // ============================
-        // START APP
-        // ============================
+        // ==============================
+        // FILTER FUNCTION
+        // ==============================
+        function filterYear(year) {
+            currentFilter = year;
+            document.getElementById("currentView").innerText = "Viewing: " + year;
+            renderTable();
+        }
+
+
+        // ==============================
+        // OPEN MODAL
+        // ==============================
+        function openModal(id, status, remarks, action) {
+
+            selectedId = id;
+            selectedStatus = status;
+            selectedRemarks = remarks;
+            selectedAction = action;
+
+            let text = "Are you sure?";
+
+            if (action === "update") {
+                text = "Change status to " + status + "?";
+            }
+
+            if (action === "delete") {
+                text = "Delete this student permanently?";
+            }
+
+            document.getElementById("modalText").innerText = text;
+            document.getElementById("confirmModal").style.display = "flex";
+        }
+
+
+        // ==============================
+        // CLOSE MODAL
+        // ==============================
+        function closeModal() {
+            document.getElementById("confirmModal").style.display = "none";
+        }
+
+
+        // ==============================
+        // CONFIRM ACTION
+        // ==============================
+        function confirmAction() {
+
+            // UPDATE
+            if (selectedAction === "update") {
+
+                fetch('/update-status', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `id=${selectedId}&status=${selectedStatus}&remarks=${selectedRemarks}`
+                })
+                    .then(() => {
+                        closeModal();
+                        loadStudents();
+                    });
+            }
+
+            // DELETE
+            if (selectedAction === "delete") {
+
+                fetch('/delete-student', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `id=${selectedId}`
+                })
+                    .then(() => {
+                        closeModal();
+                        loadStudents();
+                    });
+            }
+        }
+
+
+        // ==============================
+        // START
+        // ==============================
         loadStudents();
 
     </script>

@@ -3,24 +3,44 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
+using System;
+
+// IMPORT YOUR MODEL
+using YourProjectName.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-// Enable static files (HTML, CSS, JS)
+
+// ==============================
+// REDIRECT TO WELCOME PAGE
+// ==============================
+app.MapGet("/", (HttpContext context) =>
+{
+    context.Response.Redirect("/welcome.html");
+    return Task.CompletedTask;
+});
+
+
+// ==============================
+// ENABLE STATIC FILES
+// ==============================
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 
 // ==============================
-// STEP 1: DATABASE SETUP
+// DATABASE PATH
 // ==============================
 string dbPath = Path.Combine(app.Environment.ContentRootPath, "Data", "students.db");
 
-// Make sure folder exists
+// CREATE DATA FOLDER IF NOT EXIST
 Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "Data"));
 
-// Create table if not exists
+
+// ==============================
+// CREATE TABLE
+// ==============================
 using (var connection = new SqliteConnection($"Data Source={dbPath}"))
 {
     connection.Open();
@@ -44,7 +64,7 @@ using (var connection = new SqliteConnection($"Data Source={dbPath}"))
 
 
 // ==============================
-// STEP 2: STAFF LOGIN
+// STAFF LOGIN
 // ==============================
 app.MapPost("/staff-login", async (HttpContext context) =>
 {
@@ -65,11 +85,22 @@ app.MapPost("/staff-login", async (HttpContext context) =>
 
 
 // ==============================
-// STEP 3: ENROLL STUDENT
+// ENROLL STUDENT (USES MODEL)
 // ==============================
 app.MapPost("/enroll", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
+
+    // CREATE OBJECT (OOP)
+    Student s = new Student
+    {
+        Name = form["Name"],
+        Email = form["Email"],
+        Contact = form["Contact"],
+        Course = form["Course"],
+        Year = int.Parse(form["Year"]),
+        Address = form["Address"]
+    };
 
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
@@ -81,12 +112,12 @@ app.MapPost("/enroll", async (HttpContext context) =>
     (Name, Email, Contact, Course, Year, Address, Status, Remarks)
     VALUES ($name, $email, $contact, $course, $year, $address, 'Pending', 'Waiting Verification');";
 
-    cmd.Parameters.AddWithValue("$name", form["Name"].ToString());
-    cmd.Parameters.AddWithValue("$email", form["Email"].ToString());
-    cmd.Parameters.AddWithValue("$contact", form["Contact"].ToString());
-    cmd.Parameters.AddWithValue("$course", form["Course"].ToString());
-    cmd.Parameters.AddWithValue("$year", form["Year"].ToString());
-    cmd.Parameters.AddWithValue("$address", form["Address"].ToString());
+    cmd.Parameters.AddWithValue("$name", s.Name);
+    cmd.Parameters.AddWithValue("$email", s.Email);
+    cmd.Parameters.AddWithValue("$contact", s.Contact);
+    cmd.Parameters.AddWithValue("$course", s.Course);
+    cmd.Parameters.AddWithValue("$year", s.Year.ToString()); // DB is TEXT
+    cmd.Parameters.AddWithValue("$address", s.Address);
 
     cmd.ExecuteNonQuery();
 
@@ -95,11 +126,11 @@ app.MapPost("/enroll", async (HttpContext context) =>
 
 
 // ==============================
-// STEP 4: GET STUDENTS (API)
+// GET STUDENTS
 // ==============================
 app.MapGet("/students", () =>
 {
-    var students = new List<object>();
+    var list = new List<object>();
 
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
@@ -111,7 +142,7 @@ app.MapGet("/students", () =>
 
     while (reader.Read())
     {
-        students.Add(new
+        list.Add(new
         {
             id = reader.GetInt32(0),
             name = reader.GetString(1),
@@ -125,21 +156,23 @@ app.MapGet("/students", () =>
         });
     }
 
-    return Results.Json(students);
+    return Results.Json(list);
 });
 
 
 // ==============================
-// STEP 5: UPDATE STATUS
+// UPDATE STATUS
 // ==============================
 app.MapPost("/update-status", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
 
+    int id = int.Parse(form["id"]);
+    string status = form["status"];
+    string remarks = form["remarks"];
+
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
-
-    int id = int.Parse(form["id"]);
 
     var cmd = connection.CreateCommand();
     cmd.CommandText =
@@ -147,27 +180,27 @@ app.MapPost("/update-status", async (HttpContext context) =>
       SET Status = $status, Remarks = $remarks
       WHERE Id = $id";
 
-    cmd.Parameters.AddWithValue("$status", form["status"].ToString());
-    cmd.Parameters.AddWithValue("$remarks", form["remarks"].ToString());
+    cmd.Parameters.AddWithValue("$status", status);
+    cmd.Parameters.AddWithValue("$remarks", remarks);
     cmd.Parameters.AddWithValue("$id", id);
 
     cmd.ExecuteNonQuery();
 
-    return Results.Ok(); // IMPORTANT
+    return Results.Ok();
 });
 
 
 // ==============================
-// STEP 6: DELETE STUDENT
+// DELETE STUDENT
 // ==============================
 app.MapPost("/delete-student", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
 
+    int id = int.Parse(form["id"]);
+
     using var connection = new SqliteConnection($"Data Source={dbPath}");
     connection.Open();
-
-    int id = int.Parse(form["id"]);
 
     var cmd = connection.CreateCommand();
     cmd.CommandText = "DELETE FROM Students WHERE Id = $id";
@@ -176,7 +209,7 @@ app.MapPost("/delete-student", async (HttpContext context) =>
 
     cmd.ExecuteNonQuery();
 
-    return Results.Ok(); // IMPORTANT
+    return Results.Ok();
 });
 
 app.Run();
