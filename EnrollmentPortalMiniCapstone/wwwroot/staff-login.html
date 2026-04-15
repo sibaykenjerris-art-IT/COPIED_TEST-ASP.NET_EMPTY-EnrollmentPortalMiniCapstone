@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Staff Login</title>
 
-    <link rel="stylesheet" href="css/staff-login.css"> <!-- NEW -->
+    <link rel="stylesheet" href="css/staff-login.css"> 
 
 </head>
 
@@ -38,13 +38,13 @@
 
     <!-- SHOW ERROR IF WRONG LOGIN -->
     <script>
-        // STEP 1: Get URL parameters
+        // step 1: Get URL parameters
         const params = new URLSearchParams(window.location.search);
 
-        // STEP 2: Check if error exists
-        if (params.get("error")) {
-
-            // STEP 3: Show message
+        // step 2: Check if error exists
+        if (params.get("error"))
+        {
+            // step 3: Show message
             document.getElementById("errorMsg").textContent = "Invalid login!";
             document.getElementById("errorMsg").style.color = "red";
         }

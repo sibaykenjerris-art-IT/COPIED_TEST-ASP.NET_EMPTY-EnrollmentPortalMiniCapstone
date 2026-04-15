@@ -10,7 +10,7 @@
 
         public string Course { get; set; }
 
-        public int Year { get; set; }
+        public string Year { get; set; } // ✅ FIXED (STRING)
 
         public string Address { get; set; }
     }

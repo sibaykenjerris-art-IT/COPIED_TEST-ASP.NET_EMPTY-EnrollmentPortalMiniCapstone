@@ -82,7 +82,6 @@
         // LOAD STUDENTS FROM SERVER
         // ==============================
         function loadStudents() {
-
             fetch('/students')
                 .then(res => res.json())
                 .then(data => {
@@ -98,7 +97,6 @@
         // RENDER TABLE + COUNTERS
         // ==============================
         function renderTable() {
-
             let table = document.getElementById("tableBody");
             table.innerHTML = "";
 
@@ -107,8 +105,7 @@
             let pending = 0;
 
             students.forEach(s => {
-
-                // FILTER FIX
+                // YEAR FILTER
                 if (currentFilter !== "All" && s.year !== currentFilter) return;
 
                 // COUNT
@@ -122,42 +119,42 @@
                 if (s.status === "Rejected") color = "red";
 
                 let row = `
-            <tr>
-                <td>${s.name}</td>
-                <td>${s.email}</td>
-                <td>${s.contact}</td>
-                <td>${s.course}</td>
-                <td>${s.year}</td>
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.contact}</td>
+                    <td>${s.course}</td>
+                    <td>${s.year}</td>
 
-                <td style="color:${color}; font-weight:bold;">
-                    ${s.status}
-                </td>
+                    <td style="color:${color}; font-weight:bold;">
+                        ${s.status}
+                    </td>
 
-                <td>${s.remarks}</td>
+                    <td>${s.remarks}</td>
 
-                <td>
-                    <div class="actions">
+                    <td>
+                        <div class="actions">
 
-                        <button class="approve"
-                        onclick="openModal(${s.id}, 'Approved', 'Verified', 'update')">
-                        Approve
-                        </button>
+                            <button class="approve"
+                            onclick="openModal(${s.id}, 'Approved', 'Verified', 'update')">
+                            Approve
+                            </button>
 
-                        <button class="reject"
-                        onclick="openModal(${s.id}, 'Rejected', 'Invalid Info', 'update')">
-                        Reject
-                        </button>
+                            <button class="reject"
+                            onclick="openModal(${s.id}, 'Rejected', 'Invalid Info', 'update')">
+                            Reject
+                            </button>
 
-                        ${s.status !== "Pending" ? `
-                        <button class="delete"
-                        onclick="openModal(${s.id}, '', '', 'delete')">
-                        Delete
-                        </button>` : ""}
+                            ${s.status !== "Pending" ? `
+                            <button class="delete"
+                            onclick="openModal(${s.id}, '', '', 'delete')">
+                            Delete
+                            </button>` : ""}
 
-                    </div>
-                </td>
-            </tr>
-            `;
+                        </div>
+                    </td>
+                </tr>
+                `;
 
                 table.innerHTML += row;
             });
@@ -183,7 +180,6 @@
         // OPEN MODAL
         // ==============================
         function openModal(id, status, remarks, action) {
-
             selectedId = id;
             selectedStatus = status;
             selectedRemarks = remarks;
@@ -220,11 +216,12 @@
             // UPDATE
             if (selectedAction === "update") {
 
-                fetch('/update-status', {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: `id=${selectedId}&status=${selectedStatus}&remarks=${selectedRemarks}`
-                })
+                fetch('/update-status',
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `id=${selectedId}&status=${selectedStatus}&remarks=${selectedRemarks}`
+                    })
                     .then(() => {
                         closeModal();
                         loadStudents();
@@ -234,11 +231,12 @@
             // DELETE
             if (selectedAction === "delete") {
 
-                fetch('/delete-student', {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: `id=${selectedId}`
-                })
+                fetch('/delete-student',
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `id=${selectedId}`
+                    })
                     .then(() => {
                         closeModal();
                         loadStudents();

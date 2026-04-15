@@ -91,15 +91,14 @@ app.MapPost("/enroll", async (HttpContext context) =>
 {
     var form = await context.Request.ReadFormAsync();
 
-    // CREATE OBJECT (OOP)
     Student s = new Student
     {
-        Name = form["Name"],
-        Email = form["Email"],
-        Contact = form["Contact"],
-        Course = form["Course"],
-        Year = int.Parse(form["Year"]),
-        Address = form["Address"]
+        Name = form["Name"].ToString(),
+        Email = form["Email"].ToString(),
+        Contact = form["Contact"].ToString(),
+        Course = form["Course"].ToString(),
+        Year = form["Year"].ToString(),
+        Address = form["Address"].ToString()
     };
 
     using var connection = new SqliteConnection($"Data Source={dbPath}");
@@ -116,7 +115,7 @@ app.MapPost("/enroll", async (HttpContext context) =>
     cmd.Parameters.AddWithValue("$email", s.Email);
     cmd.Parameters.AddWithValue("$contact", s.Contact);
     cmd.Parameters.AddWithValue("$course", s.Course);
-    cmd.Parameters.AddWithValue("$year", s.Year.ToString()); // DB is TEXT
+    cmd.Parameters.AddWithValue("$year", s.Year);
     cmd.Parameters.AddWithValue("$address", s.Address);
 
     cmd.ExecuteNonQuery();

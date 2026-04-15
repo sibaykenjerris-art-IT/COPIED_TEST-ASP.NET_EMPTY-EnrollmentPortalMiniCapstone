@@ -9,7 +9,7 @@ h1 {
     text-align: center;
     padding: 20px;
 }
-/* ============================ LOGOUT BUTTON (NEW) ============================ */
+/* ============================ LOGOUT BUTTON ============================ */
 
 .logout {
     position: absolute;
@@ -31,7 +31,7 @@ h1 {
     padding: 20px;
     border-radius: 10px;
 }
-/* ============================ STATS (IMPROVED) ============================ */
+/* ============================ STATS ============================ */
 
 #stats {
     display: flex;
@@ -78,7 +78,7 @@ h1 {
         background: #0a1f66;
         color: white;
     }
-/* ============================ CURRENT FILTER TEXT (NEW) ============================ */
+/* ============================ CURRENT FILTER TEXT ============================ */
 
 #currentView {
     text-align: center;
@@ -103,12 +103,12 @@ th {
     background: #0a1f66;
     color: white;
 }
-/* ============================ ACTION BUTTONS (FIXED) ============================ */
+/* ============================ ACTION BUTTONS============================ */
 
 .actions {
     display: flex;
     justify-content: center;
-    gap: 5px; /* spacing */
+    gap: 5px; 
 }
 
 .approve {
@@ -129,7 +129,7 @@ th {
 button:hover {
     opacity: 0.8;
 }
-/* ============================ MODAL (KEEP WORKING) ============================ */
+/* ============================ MODAL ============================ */
 
 .modal {
     display: none;
